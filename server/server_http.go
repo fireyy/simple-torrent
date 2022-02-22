@@ -31,6 +31,12 @@ func (s *Server) webHandle(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Accept") == "text/event-stream" {
 			// avoid gzip buffer
 			w.Header().Set("Content-Encoding", "identity")
+			origin := r.Header.Get("Origin")
+			if origin == "" {
+				origin = "*"
+			}
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
 		}
 		conn, err := velox.Sync(&s.state, w, r)
 		if err != nil {
@@ -54,6 +60,14 @@ func (s *Server) webHandle(w http.ResponseWriter, r *http.Request) {
 	pathDir := strings.SplitN(r.URL.Path[1:], "/", 2)
 	switch pathDir[0] {
 	case "search":
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			origin = "*"
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		s.scraperh.ServeHTTP(w, r)
 	case "api":
 		origin := r.Header.Get("Origin")
@@ -61,7 +75,9 @@ func (s *Server) webHandle(w http.ResponseWriter, r *http.Request) {
 			origin = "*"
 		}
 		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		s.restAPIhandle(w, r)
 	case "download":
 		s.dlfilesh.ServeHTTP(w, r)
@@ -81,6 +97,9 @@ func (s *Server) webHandle(w http.ResponseWriter, r *http.Request) {
 // restAPIhandle is used both by main webserver and restapi server
 func (s *Server) restAPIhandle(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	case "OPTIONS":
+		w.WriteHeader(http.StatusNoContent)
+		return
 	case "POST":
 		if err := s.apiPOST(r); err != nil {
 			http.Error(w, fmt.Sprintf("%s:%s:%v", r.Method, r.URL, err.Error()), http.StatusBadRequest)

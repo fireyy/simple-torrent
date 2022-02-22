@@ -30,6 +30,10 @@ case $arg in
 	arm64)
 		ARCH=arm64
 		;;
+	arm)
+		OS=linux
+		ARCH=arm
+		;;		
 	386)
 		ARCH=386
 		;;
@@ -70,8 +74,9 @@ if [[ -z $ARCH ]]; then
 fi
 
 pushd $__dir/..
+# TODO: check GOARM
 BINFILE=${BINPREFIX}${BIN}_${OS}_${ARCH}${SUFFIX}${OSSUFFIX}
-CGO_ENABLED=$CGO GOARCH=$ARCH GOOS=$OS \
+CGO_ENABLED=$CGO GOARCH=$ARCH GOARM=7 GOOS=$OS \
 	go build -o ${BINFILE} \
 		-trimpath \
 		-ldflags "${GO_LDFLAGS}" \

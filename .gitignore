@@ -7,3 +7,4 @@ tmp/
 play*.yml
 .vscode
 .torrent.bolt.db
+.DS_Store
