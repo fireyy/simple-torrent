@@ -29,6 +29,7 @@ import (
 	"github.com/mmcdole/gofeed"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/viper"
+	"github.com/rs/cors"
 )
 
 const (
@@ -230,7 +231,13 @@ func (s *Server) Run(tpl *TPLInfo) error {
 	}
 
 	//define handler chain, from last to first
-	h := http.Handler(http.HandlerFunc(s.webHandle))
+	// h := http.Handler(http.HandlerFunc(s.webHandle))
+	// enable cors
+	cs := cors.New(cors.Options{
+		AllowedMethods: []string{"POST", "GET", "OPTIONS"},
+		AllowCredentials: true,
+	})
+	h := cs.Handler(http.HandlerFunc(s.webHandle))
 	//gzip
 	h = httpmiddleware.RealIP(h)
 	h = httpmiddleware.Liveness(h)
