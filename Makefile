@@ -10,7 +10,7 @@ get:
 	go mod download
 
 run:
-	go run .
+	go run . -p 3001 --debug
 
 test:
 	go test ./... -v

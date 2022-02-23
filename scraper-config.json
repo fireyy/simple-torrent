@@ -1,7 +1,7 @@
 {
   "1024bt": {
     "name": "1024BT",
-    "url": "https://1024bt9.xyz/main-search-kw-{{query}}-{{page:0}}.html",
+    "url": "https://1024bt9.xyz/main-search-kw-{{query}}-{{page:1}}.html",
     "list": "div.search-item",
     "result": {
       "name": [
