@@ -21,6 +21,7 @@ PKGCMD=
 CGO=1
 GO_LDFLAGS="-s -w -X main.VERSION=$GITVER"
 GO_TAGS=""
+ARM=6
 
 for arg in "$@"; do
 case $arg in
@@ -30,9 +31,10 @@ case $arg in
 	arm64)
 		ARCH=arm64
 		;;
-	arm)
+	arm7)
 		OS=linux
 		ARCH=arm
+		ARM=7
 		;;		
 	386)
 		ARCH=386
@@ -74,13 +76,21 @@ if [[ -z $ARCH ]]; then
 fi
 
 pushd $__dir/..
-# TODO: check GOARM
 BINFILE=${BINPREFIX}${BIN}_${OS}_${ARCH}${SUFFIX}${OSSUFFIX}
-CGO_ENABLED=$CGO GOARCH=$ARCH GOARM=7 GOOS=$OS \
-	go build -o ${BINFILE} \
-		-trimpath \
-		-ldflags "${GO_LDFLAGS}" \
-		-tags "${GO_TAGS}"
+if [[ $ARCH == "arm" ]]; then
+	CGO_ENABLED=$CGO GOARCH=$ARCH GOARM=$ARM GOOS=$OS \
+		go build -o ${BINFILE} \
+			-trimpath \
+			-ldflags "${GO_LDFLAGS}" \
+			-tags "${GO_TAGS}"
+else
+	CGO_ENABLED=$CGO GOARCH=$ARCH GOOS=$OS \
+		go build -o ${BINFILE} \
+			-trimpath \
+			-ldflags "${GO_LDFLAGS}" \
+			-tags "${GO_TAGS}"
+fi
+
 if [[ ! -f ${BINFILE} ]]; then
   echo "Build failed. Check with error message above."
   exit 1
