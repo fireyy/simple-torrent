@@ -15,6 +15,7 @@ import (
 
 	"github.com/boypt/simple-torrent/common"
 	"github.com/boypt/simple-torrent/server/httpmiddleware"
+	"github.com/rs/cors"
 
 	"errors"
 
@@ -29,7 +30,6 @@ import (
 	"github.com/mmcdole/gofeed"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/viper"
-	"github.com/rs/cors"
 )
 
 const (
@@ -43,7 +43,7 @@ var (
 	ErrDiskSpace = errors.New("not enough disk space")
 )
 
-//Server is the "State" portion of the diagram
+// Server is the "State" portion of the diagram
 type Server struct {
 	//config
 	Title          string `opts:"help=Title of this instance,env=TITLE"`
@@ -234,7 +234,8 @@ func (s *Server) Run(tpl *TPLInfo) error {
 	// h := http.Handler(http.HandlerFunc(s.webHandle))
 	// enable cors
 	cs := cors.New(cors.Options{
-		AllowedMethods: []string{"POST", "GET", "OPTIONS"},
+		AllowedHeaders:   []string{"Cache-Control"},
+		AllowedMethods:   []string{"POST", "GET", "OPTIONS"},
 		AllowCredentials: true,
 	})
 	h := cs.Handler(http.HandlerFunc(s.webHandle))

@@ -17,3 +17,6 @@ test:
 
 clean:
 	rm -f $(app_name)
+
+release:
+	bash scripts/make_release.sh gzip arm7 purego
