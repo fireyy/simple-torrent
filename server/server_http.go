@@ -32,6 +32,13 @@ func (s *Server) webHandle(w http.ResponseWriter, r *http.Request) {
 			// avoid gzip buffer
 			w.Header().Set("Content-Encoding", "identity")
 		}
+
+		// handle CORS Preflight request
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
 		conn, err := velox.Sync(&s.state, w, r)
 		if err != nil {
 			log.Printf("sync failed: %s", err)
