@@ -234,10 +234,12 @@ func (s *Server) Run(tpl *TPLInfo) error {
 	// h := http.Handler(http.HandlerFunc(s.webHandle))
 	// enable cors
 	cs := cors.New(cors.Options{
-		AllowedHeaders: []string{"Cache-Control"},
-		AllowedMethods: []string{"POST", "GET", "OPTIONS"},
-		// AllowedOrigins:   []string{"http://127.0.0.1:8080"},
-		// AllowCredentials: true,
+		AllowedHeaders:   []string{"Cache-Control", "Content-Type"},
+		AllowedMethods:   []string{"POST", "GET", "OPTIONS"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
 	})
 	h := cs.Handler(http.HandlerFunc(s.webHandle))
 	//gzip
